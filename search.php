@@ -7,8 +7,8 @@ $name = $_POST["uname"] ?? "";
 $pwd = $_POST["pwd"] ?? "";
 
 // 2. Search user in DB (Safe way)
-$sql = "SELECT * FROM login WHERE loginname = ? AND pwd = ?";
-$response = safeQuery($sql, "ss", [$name, $pwd]);
+$sql = "SELECT * FROM member WHERE member_id = ?";
+$response = safeQuery($sql, "s", [$name]);
 
 // 3. If SQL crash, show error and stop
 if (!$response->success) {
@@ -16,9 +16,11 @@ if (!$response->success) {
     die;
 }
 
-// 4. If found a match, save username to Session
+// 4. If found a row, verify password and save username to Session
 if ($response->result && $data = $response->result->fetch_assoc()) {
-    $_SESSION["login"] = $data['loginname'];
+    if (password_verify($pwd, $data['pwd'])) {
+        $_SESSION["login"] = $data['member_id'];
+    }
 }
 
 // 5. Final check: if Session has name -> Login Success!

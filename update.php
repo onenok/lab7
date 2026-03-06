@@ -26,17 +26,24 @@ $newPwdInput = $_POST["new_pwd"] ?? "";
 $confirmPwd = $_POST["confirm_new_pwd"] ?? ""; // new
 
 // --- [STEP 1: AUTH CHECK] ---
+// make sure old password is provided
 if (empty($oldPwd)) {
   header('Location: editAccount.php?msg=old_pwd_empty');
   exit;
 }
 
-$sql_auth = "SELECT * FROM login WHERE loginname = ? AND pwd = ?";
-$authRes = safeQuery($sql_auth, "ss", [$oldName, $oldPwd]);
-
+// fetch user row from member table
+$sql_auth = "SELECT * FROM member WHERE member_id = ?";
+$authRes = safeQuery($sql_auth, "s", [$oldName]);
 if (!$authRes->success || $authRes->result->num_rows == 0) {
-  header('Location: editAccount.php?msg=invalid_user_or_password');
-  exit;
+    header('Location: editAccount.php?msg=invalid_user_or_password');
+    exit;
+}
+$row = $authRes->result->fetch_assoc();
+// verify password hash
+if (!password_verify($oldPwd, $row['pwd'])) {
+    header('Location: editAccount.php?msg=invalid_user_or_password');
+    exit;
 }
 
 // --- [NEW STEP: CONFIRM CHECK] ---
@@ -58,7 +65,8 @@ if (empty($newNameInput) && empty($newPwdInput)) {
 }
 
 $isNameSame = (empty($newNameInput) || $newNameInput === $oldName);
-$isPwdSame = (empty($newPwdInput) || $newPwdInput === $oldPwd);
+// compare new password against existing hash
+$isPwdSame = (empty($newPwdInput) || password_verify($newPwdInput, $row['pwd']));
 
 if ($isNameSame && $isPwdSame) {
   header('Location: editAccount.php?msg=no_changes');
@@ -67,7 +75,7 @@ if ($isNameSame && $isPwdSame) {
 
 // --- [STEP 3: CONFLICT CHECK] ---
 if (!empty($newNameInput) && $newNameInput !== $oldName) {
-  $sql_checkName = "SELECT * FROM login WHERE loginname = ?";
+  $sql_checkName = "SELECT * FROM member WHERE member_id = ?";
   $nameRes = safeQuery($sql_checkName, "s", [$newNameInput]);
   if ($nameRes->result && $nameRes->result->num_rows > 0) {
     header('Location: editAccount.php?msg=username_already_used');
@@ -77,10 +85,10 @@ if (!empty($newNameInput) && $newNameInput !== $oldName) {
 
 // --- [STEP 4: FINAL ACTION] ---
 $finalName = !empty($newNameInput) ? $newNameInput : $oldName;
-$finalPwd = !empty($newPwdInput) ? $newPwdInput : $oldPwd;
+$finalPwdHash = !empty($newPwdInput) ? password_hash($newPwdInput, PASSWORD_DEFAULT) : $row['pwd'];
 
-$sql_update = "UPDATE `login` SET `loginname` = ?, `pwd` = ? WHERE `loginname` = ?";
-$updateRes = safeQuery($sql_update, "sss", [$finalName, $finalPwd, $oldName]);
+$sql_update = "UPDATE `member` SET `member_id` = ?, `pwd` = ? WHERE `member_id` = ?";
+$updateRes = safeQuery($sql_update, "sss", [$finalName, $finalPwdHash, $oldName]);
 
 if ($updateRes->affected_rows > 0) {
   unset($_SESSION['login']); 

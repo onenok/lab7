@@ -32,7 +32,7 @@ if ($pwd !== $confirm_pwd) {
 }
 
 // 6. Check DB: Is this username already taken?
-$sql_check = "SELECT * FROM login WHERE loginname = ?";
+$sql_check = "SELECT * FROM member WHERE member_id = ?";
 $res = safeQuery($sql_check, "s", [$name]);
 
 // If found 1 or more rows, means name exists
@@ -41,9 +41,10 @@ if ($res->result && $res->result->num_rows > 0) {
   exit;
 }
 
-// 6. All clear! Let's insert new user
-$sql_insert = "INSERT INTO login(loginname, pwd) VALUES (?, ?)";
-$res = safeQuery($sql_insert, "ss", [$name, $pwd]);
+// 6. All clear! Let's insert new user (remember to hash password and set display name)
+$hashed = password_hash($pwd, PASSWORD_DEFAULT);
+$sql_insert = "INSERT INTO member(member_id, pwd, member_name) VALUES (?, ?, ?)";
+$res = safeQuery($sql_insert, "sss", [$name, $hashed, $name]);
 
 // 7. Check if 1 row was added successfully
 if ($res->affected_rows > 0) {

@@ -26,17 +26,20 @@ if ($name !== $loginname) {
 }
 
 // 4. Verify password before delete
-$sql = "SELECT * FROM login WHERE loginname = ? AND pwd = ?";
-$checkQuery = safeQuery($sql, "ss", [$name, $pwd]);
-
-// If password wrong or user not found
-if ($checkQuery->result->num_rows == 0) {
-  header("Location: cancellation.php?msg=invalid_user_or_password");
-  exit;
+$sql = "SELECT * FROM member WHERE member_id = ?";
+$checkQuery = safeQuery($sql, "s", [$name]);
+if (!$checkQuery->success || $checkQuery->result->num_rows == 0) {
+    header("Location: cancellation.php?msg=invalid_user_or_password");
+    exit;
+}
+$row = $checkQuery->result->fetch_assoc();
+if (!password_verify($pwd, $row['pwd'])) {
+    header("Location: cancellation.php?msg=invalid_user_or_password");
+    exit;
 }
 
 // 5. All good! Do the final delete
-$sql = "DELETE FROM login WHERE loginname = ?";
+$sql = "DELETE FROM member WHERE member_id = ?";
 $result = safeQuery($sql, "s", [$name]);
 
 // 6. Success: Clear session and go to index
