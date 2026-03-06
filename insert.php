@@ -1,0 +1,60 @@
+<?php
+session_start();
+
+// 1. Safety check: Kick out if not POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+  header("Location: signup.php?msg=try_to_access_directly");
+  exit;
+}
+require_once("connect.php");
+
+// 2. If user already logged-in, don't let them signup again
+if (!empty($_SESSION["login"])) {
+  header("Location:index.php?msg=signup_already_logged_in");
+  exit; // Added exit for safety
+}
+
+// 3. Get data from signup form
+$name = $_POST["uname"] ?? "";
+$pwd = $_POST["pwd"] ?? "";
+$confirm_pwd = $_POST["confirm_pwd"] ?? "";
+
+// 4. Basic check: fields cannot be empty
+if (empty($name) || empty($pwd) || empty($confirm_pwd)) {
+  header("Location: signup.php?msg=empty_fields");
+  exit;
+}
+
+// 5. Check if passwords match
+if ($pwd !== $confirm_pwd) {
+  header("Location: signup.php?msg=passwords_dont_match");
+  exit;
+}
+
+// 6. Check DB: Is this username already taken?
+$sql_check = "SELECT * FROM login WHERE loginname = ?";
+$res = safeQuery($sql_check, "s", [$name]);
+
+// If found 1 or more rows, means name exists
+if ($res->result && $res->result->num_rows > 0) {
+  header("Location: signup.php?msg=name_exists");
+  exit;
+}
+
+// 6. All clear! Let's insert new user
+$sql_insert = "INSERT INTO login(loginname, pwd) VALUES (?, ?)";
+$res = safeQuery($sql_insert, "ss", [$name, $pwd]);
+
+// 7. Check if 1 row was added successfully
+if ($res->affected_rows > 0) {
+  // logic: Signup success -> go to login page
+  header("Location: login.php?msg=registered");
+  exit;
+} else {
+  // DB error or something wrong
+  header("Location: signup.php?msg=failed");
+  exit;
+}
+
+$conn->close();
+?>
