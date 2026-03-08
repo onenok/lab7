@@ -141,6 +141,7 @@ $display_msg = $messages[$msg_key] ?? '';
 
     <!-- 4. Submit to search.php (Login Process) -->
     <form action="search.php" method="post">
+      <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
       <hr>
       <label id="icon" for="name"><i class="fas fa-user"></i></label>
       <input type="text" name="uname" id="name" placeholder="Name" required />

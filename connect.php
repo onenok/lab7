@@ -13,6 +13,18 @@ if ($conn->connect_error) {
     die("connect failed: " . $conn->connect_error);
 }
 
+// Ensure a per-session CSRF token exists when session is active
+if (session_status() === PHP_SESSION_ACTIVE) {
+    if (empty($_SESSION['csrf_token'])) {
+        try {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        } catch (Exception $e) {
+            // fallback to less-preferred method if random_bytes fails
+            $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+    }
+}
+
 // function to make SQL safe (No SQL Injection)
 function safeQuery($sql, $types = null, $params = []) {
     global $conn;

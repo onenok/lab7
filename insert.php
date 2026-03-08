@@ -8,6 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 require_once("connect.php");
 
+// CSRF validation
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+  header("Location: signup.php?msg=try_to_access_directly");
+  exit;
+}
+
 // 2. If user already logged-in, don't let them signup again
 if (!empty($_SESSION["login"])) {
   header("Location:index.php?msg=signup_already_logged_in");
@@ -41,7 +47,7 @@ if ($res->result && $res->result->num_rows > 0) {
   exit;
 }
 
-// 6. All clear! Let's insert new user (remember to hash password and set display name)
+// 6. insert new user
 $hashed = password_hash($pwd, PASSWORD_DEFAULT);
 $sql_insert = "INSERT INTO member(member_id, pwd, member_name) VALUES (?, ?, ?)";
 $res = safeQuery($sql_insert, "sss", [$name, $hashed, $name]);

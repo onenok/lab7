@@ -6,13 +6,19 @@ require_once("connect.php");
 $name = $_POST["uname"] ?? "";
 $pwd = $_POST["pwd"] ?? "";
 
+// CSRF validation (login)
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+    header("Location: login.php?msg=try_to_access_directly");
+    exit;
+}
+
 // 2. Search user in DB (Safe way)
 $sql = "SELECT * FROM member WHERE member_id = ?";
 $response = safeQuery($sql, "s", [$name]);
 
 // 3. If SQL crash, show error and stop
 if (!$response->success) {
-    echo "failed to select: " . $response->error;
+    error_log("failed to select: " . $response->error);
     die;
 }
 
