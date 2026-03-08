@@ -33,6 +33,14 @@
 - 常用 types：`feat`（功能/行為變更）、`fix`（安全修正）、`chore`（維護）。使用者偏好以 `type: desc` 單行訊息。
 
 ## 立即可用的代碼範例（搜尋與驗證）
+safeQuery
+```php
+function safeQuery($sql, $types = null, $params = []) { }
+@param mixed $sql
+@param mixed $types
+@param array $params
+@return \stdClass
+```
 示例：安全的登入查詢
 ```php
 $sql = "SELECT * FROM member WHERE member_id = ?";
@@ -48,6 +56,51 @@ if ($res->result && $row = $res->result->fetch_assoc()) {
 ```php
 $insert = safeQuery("INSERT INTO member(member_id,pwd,member_name) VALUES(?,?,?)","sss",[$id,$hash,$display]);
 if ($insert->affected_rows > 0) { /* success */ }
+```
+
+## database structure
+```sql
+CREATE TABLE `member` (
+  `member_id` varchar(50) NOT NULL COMMENT '登入帳號，註冊後不可更改',
+  `pwd` varchar(255) NOT NULL COMMENT '密碼（建議使用雜湊）',
+  `member_name` varchar(100) NOT NULL COMMENT '顯示名稱，可重複',
+  `member_telno` varchar(20) DEFAULT NULL COMMENT '電話號碼，可為空',
+  `member_addr` text DEFAULT NULL COMMENT '地址，可為空',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`member_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='會員資料表'
+
+CREATE TABLE `cart` (
+  `cart_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號',
+  `member_id` varchar(50) NOT NULL COMMENT '會員帳號',
+  `product_id` int(11) NOT NULL COMMENT '商品編號（參考 products 表）',
+  `snapshot_name` varchar(100) NOT NULL COMMENT '加入時的商品名稱',
+  `snapshot_price` decimal(10,2) NOT NULL COMMENT '加入時的價格',
+  `snapshot_description` text DEFAULT NULL COMMENT '加入時的描述（可選）',
+  `snapshot_type` enum('drinks','food','toy','e-things') NOT NULL COMMENT '加入時的類型',
+  `qty` int(11) unsigned NOT NULL DEFAULT 1 COMMENT '數量',
+  `created_at` datetime DEFAULT current_timestamp() COMMENT '加入時間',
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '最後修改時間',
+  PRIMARY KEY (`cart_id`),
+  UNIQUE KEY `uk_member_product` (`member_id`,`product_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='購物車（快照版）'
+
+CREATE TABLE `products` (
+  `product_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品唯一編號',
+  `product_name` varchar(100) NOT NULL COMMENT '商品名稱',
+  `type` enum('drinks','food','toy','e-things') NOT NULL COMMENT '商品類型',
+  `supplier` varchar(80) DEFAULT NULL COMMENT '供應商',
+  `description` text DEFAULT NULL COMMENT '商品描述',
+  `price` decimal(10,2) NOT NULL COMMENT '售價',
+   `qty` int(11) unsigned NOT NULL DEFAULT 1 COMMENT 'Stock level of product',
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '最後修改時間',
+  `created_at` datetime DEFAULT current_timestamp() COMMENT '建立時間',
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='商品資料表'
 ```
 
 ## 風險點 & 探查清單（修改時要檢查）

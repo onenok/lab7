@@ -23,12 +23,13 @@ $display_msg = $messages[$msg_key] ?? '';
 <head>
   <meta charset="UTF-8">
   <title>Signup Form</title>
-  <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css?v=<?php echo filemtime('style.css'); ?>">
 </head>
 
 <body>
   <!-- Submit to insert.php (Signup Process) -->
   <form action="./insert.php" method="post">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
     <section>
       <div class="signup">
         <div class="content">
@@ -67,8 +68,8 @@ $display_msg = $messages[$msg_key] ?? '';
 
 <script type="text/javascript">
   // Lazy JS: Check if two passwords match
-  var password = document.getElementsByName("pwd")[0];
-  var confirm_password = document.getElementsByName("confirm_pwd")[0];
+  const password = document.getElementsByName("pwd")[0];
+  const confirm_password = document.getElementsByName("confirm_pwd")[0];
 
   function validatePassword() {
     if (password.value != confirm_password.value) {

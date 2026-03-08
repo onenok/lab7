@@ -3,13 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2026-03-06 13:53:12
+-- 產生時間： 2026-03-08 03:41:27
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+08:00";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -35,10 +35,17 @@ CREATE TABLE `cart` (
   `snapshot_price` decimal(10,2) NOT NULL COMMENT '加入時的價格',
   `snapshot_description` text DEFAULT NULL COMMENT '加入時的描述（可選）',
   `snapshot_type` enum('drinks','food','toy','e-things') NOT NULL COMMENT '加入時的類型',
-  `qty` int(11) NOT NULL DEFAULT 1 COMMENT '數量',
+  `qty` int(11) UNSIGNED NOT NULL DEFAULT 1 COMMENT '數量',
   `created_at` datetime DEFAULT current_timestamp() COMMENT '加入時間',
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '最後修改時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='購物車（快照版）';
+
+--
+-- 傾印資料表的資料 `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `member_id`, `product_id`, `snapshot_name`, `snapshot_price`, `snapshot_description`, `snapshot_type`, `qty`, `created_at`, `updated_at`) VALUES
+(5, 'aeoja', 1, '可樂 Classic', 18.50, '經典碳酸飲料，冰涼爽口', 'drinks', 1, '2026-03-08 10:21:23', '2026-03-08 10:21:23');
 
 -- --------------------------------------------------------
 
@@ -61,6 +68,7 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`member_id`, `pwd`, `member_name`, `member_telno`, `member_addr`, `created_at`, `updated_at`) VALUES
+('aeoja', '$2y$10$qwhCEAPj5wE30a7GpIXqMeH6hNs1xhB.dqJG9JFK2Xddiq4yxEMWG', 'aeoja', NULL, NULL, '2026-03-06 21:28:44', '2026-03-06 21:28:44'),
 ('jackyhk', 'jackyhk99', 'Jacky HK', NULL, NULL, '2026-03-06 15:47:54', '2026-03-06 15:47:54'),
 ('kenny123', 'kenny1234', 'Kenny Wong', '91234567', 'Room 101, Block A', '2026-03-06 15:47:54', '2026-03-06 15:47:54'),
 ('lily_ho', 'lilyho2023', 'Lily Ho', '98765432', NULL, '2026-03-06 15:47:54', '2026-03-06 15:47:54'),
@@ -81,6 +89,7 @@ CREATE TABLE `products` (
   `supplier` varchar(80) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
+  `qty` int(11) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Stock level of product',
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -89,26 +98,42 @@ CREATE TABLE `products` (
 -- 傾印資料表的資料 `products`
 --
 
-INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `description`, `price`, `updated_at`, `created_at`) VALUES
-(1, '可樂 Classic', 'drinks', '可口可樂公司', '經典碳酸飲料，冰涼爽口', 18.50, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(2, '鮮奶茶 500ml', 'drinks', '統一企業', '濃郁奶香紅茶', 25.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(3, '礦泉水 600ml', 'drinks', '康師傅', '天然弱鹼性水', 8.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(5, '巧克力夾心餅乾', 'food', 'OREO', '酥脆可口夾心', 32.50, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(6, '牛肉乾原味', 'food', '老四川', '香辣軟嫩牛肉乾', 68.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(7, '泰國芒果乾', 'food', '泰國皇家', '天然果乾無添加', 55.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(8, '樂高經典積木 1000片', 'toy', 'LEGO', '基礎創意積木組', 399.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(9, '毛絨泰迪熊 50cm', 'toy', '迪士尼授權', '超軟Q彈抱抱熊', 280.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(10, '遙控賽車 1:16', 'toy', 'Double Eagle', '高速四驅越野車', 450.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(11, '泡泡槍 電動', 'toy', '玩具反斗城', '夏天戶外必備', 120.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(12, '無線藍牙耳機 TWS', 'e-things', '小米', '降噪入耳式', 499.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(13, '行動電源 20000mAh', 'e-things', 'Anker', '快充支援PD', 799.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(14, 'USB-C 充電線 1.2m', 'e-things', 'Belkin', '耐彎折編織線', 149.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(15, '智慧檯燈 護眼', 'e-things', 'Yeelight', '色溫可調 USB供電', 299.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(16, '綠茶無糖 580ml', 'drinks', '統一', '清爽日式綠茶', 19.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(17, '洋蔥圈零食', 'food', '好麗友', '香脆洋蔥風味', 28.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(18, '變形金剛 柯博文', 'toy', '孩之寶', '經典領袖級變形', 1200.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(19, '無線充電板 15W', 'e-things', 'Baseus', '支援多協議快充', 299.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28'),
-(20, '鳳梨酥禮盒 12入', 'food', '微熱山丘', '經典伴手禮', 380.00, '2026-03-06 15:57:28', '2026-03-06 15:57:28');
+INSERT INTO `products` (`product_id`, `product_name`, `type`, `supplier`, `description`, `price`, `qty`, `updated_at`, `created_at`) VALUES
+(1, '可樂 Classic', 'drinks', '可口可樂公司', '經典碳酸飲料，冰涼爽口', 18.50, 9, '2026-03-07 22:38:29', '2026-03-06 15:57:28'),
+(3, '礦泉水 600ml', 'drinks', '康師傅', '天然弱鹼性水', 8.00, 0, '2026-03-07 22:38:29', '2026-03-06 15:57:28'),
+(5, '巧克力夾心餅乾', 'food', 'OREO', '酥脆可口夾心', 32.50, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(6, '牛肉乾原味', 'food', '老四川', '香辣軟嫩牛肉乾', 68.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(7, '泰國芒果乾', 'food', '泰國皇家', '天然果乾無添加', 55.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(8, '樂高經典積木 1000片', 'toy', 'LEGO', '基礎創意積木組', 399.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(9, '毛絨泰迪熊 50cm', 'toy', '迪士尼授權', '超軟Q彈抱抱熊', 280.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(10, '遙控賽車 1:16', 'toy', 'Double Eagle', '高速四驅越野車', 450.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(11, '泡泡槍 電動', 'toy', '玩具反斗城', '夏天戶外必備', 120.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(12, '無線藍牙耳機 TWS', 'e-things', '小米', '降噪入耳式', 499.00, 0, '2026-03-07 22:38:29', '2026-03-06 15:57:28'),
+(13, '行動電源 20000mAh', 'e-things', 'Anker', '快充支援PD', 799.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(14, 'USB-C 充電線 1.2m', 'e-things', 'Belkin', '耐彎折編織線', 149.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(15, '智慧檯燈 護眼', 'e-things', 'Yeelight', '色溫可調 USB供電', 299.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(19, '無線充電板 15W', 'e-things', 'Baseus', '支援多協議快充', 299.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(20, '鳳梨酥禮盒 12入', 'food', '微熱山丘', '經典伴手禮', 380.00, 10, '2026-03-07 12:22:48', '2026-03-06 15:57:28'),
+(21, 'Green Tea Latte', 'drinks', 'Starbucks', 'Creamy matcha with milk and whipped cream', 38.00, 45, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(22, 'Espresso Shot', 'drinks', 'Illy', 'Single shot of strong Italian espresso', 28.50, 120, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(23, 'Coconut Water', 'drinks', 'Vita Coco', 'Pure coconut water – no added sugar', 18.00, 80, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(24, 'Almond Milk Original', 'drinks', 'Alpro', 'Unsweetened plant-based milk', 22.90, 60, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(25, 'Strawberry Yogurt Drink', 'drinks', 'Yakult', 'Probiotic strawberry flavored yogurt drink', 12.50, 200, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(26, 'Potato Chips Sea Salt', 'food', 'Lay\'s', 'Classic thin & crispy potato chips', 18.00, 150, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(27, 'Dark Chocolate 70%', 'food', 'Lindt', 'Smooth Swiss dark chocolate bar', 45.00, 90, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(28, 'Beef Jerky Spicy', 'food', 'Jack Link\'s', 'Premium tender beef jerky – hot & spicy', 68.00, 70, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(29, 'Dried Mango Slices', 'food', 'Philippine Brand', 'Sweet & chewy natural dried mango', 55.00, 110, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(30, 'Instant Ramen Spicy Chicken', 'food', 'Samyang', 'Extremely spicy Korean instant noodles', 15.90, 300, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(31, 'LEGO Classic Creative Box', 'toy', 'LEGO', 'Large box with 790 colorful bricks', 299.00, 35, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(32, 'Plush Unicorn 40cm', 'toy', 'Squishmallows', 'Super soft & cuddly pastel unicorn', 189.00, 50, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(33, 'Remote Control Helicopter', 'toy', 'Syma', 'Mini indoor RC helicopter with LED lights', 249.00, 28, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(34, 'Magnetic Building Tiles', 'toy', 'PicassoTiles', '64-piece translucent magnetic tiles set', 399.00, 42, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(35, 'Wireless Gaming Mouse', 'e-things', 'Logitech', 'RGB gaming mouse with 16K DPI sensor', 299.00, 65, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(36, 'USB-C Hub 7-in-1', 'e-things', 'Anker', 'HDMI, SD reader, USB ports & PD charging', 198.00, 88, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(37, 'Portable SSD 1TB', 'e-things', 'Samsung T7', 'Fast USB 3.2 Gen2 external SSD – black', 799.00, 55, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(38, 'Bluetooth Speaker Mini', 'e-things', 'JBL Go 3', 'Waterproof portable speaker with rich sound', 349.00, 95, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(39, 'Smart LED Bulb E27', 'e-things', 'Philips Hue', 'Color & white ambiance – works with Alexa', 129.00, 140, '2026-03-07 14:16:57', '2026-03-07 14:16:57'),
+(40, 'Mechanical Keyboard RGB', 'e-things', 'Keychron K2', 'Wireless hot-swappable mechanical keyboard', 599.00, 38, '2026-03-07 14:16:57', '2026-03-07 14:16:57');
 
 --
 -- 已傾印資料表的索引
@@ -142,13 +167,13 @@ ALTER TABLE `products`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號';
+  MODIFY `cart_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '購物車項目唯一編號', AUTO_INCREMENT=6;
 
 --
 -- 使用資料表自動遞增(AUTO_INCREMENT) `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- 已傾印資料表的限制式

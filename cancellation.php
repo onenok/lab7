@@ -49,6 +49,7 @@ $display_msg = $msgs[$msg_key] ?? '';
     <!-- POST form to delete.php -->
     <!-- Lazy JS: Add a pop-up alert to double check -->
     <form action="delete.php" method="POST" onsubmit="return confirm('Really want to delete?');">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         
         <label>Confirm Username:</label>
         <input type="text" name="uname" placeholder="Enter your username" required>

@@ -19,6 +19,12 @@ if (empty($_SESSION['login'])) {
 $oldName = $_SESSION['login']; 
 $oldPwd = $_POST["old_pwd"] ?? ""; 
 
+// CSRF validation
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+  header('Location: editAccount.php?msg=try_to_access_directly');
+  exit;
+}
+
 $newNameInput = $_POST["new_uname"] ?? ""; 
 $confirmName = $_POST["confirm_new_uname"] ?? ""; // new
 

@@ -56,6 +56,7 @@ $display_msg = $msgs[$msg_key] ?? '';
     <?php endif; ?>
 
     <form action="update.php" method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
         <p style="font-size: 14px;">目前帳號: <strong><?php echo htmlspecialchars($currentName); ?></strong></p>
 
         <hr>
@@ -90,10 +91,10 @@ $display_msg = $msgs[$msg_key] ?? '';
 
 <script>
     // Lazy JS: Check match for Name and Pwd
-    var nName = document.getElementsByName("new_uname")[0];
-    var cName = document.getElementsByName("confirm_new_uname")[0];
-    var nPwd = document.getElementsByName("new_pwd")[0];
-    var cPwd = document.getElementsByName("confirm_new_pwd")[0];
+    const nName = document.getElementsByName("new_uname")[0];
+    const cName = document.getElementsByName("confirm_new_uname")[0];
+    const nPwd = document.getElementsByName("new_pwd")[0];
+    const cPwd = document.getElementsByName("confirm_new_pwd")[0];
 
     function validate() {
         // check name

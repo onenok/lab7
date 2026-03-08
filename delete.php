@@ -19,6 +19,12 @@ $loginname = $_SESSION['login'];
 $name = $_POST["uname"] ?? "";
 $pwd = $_POST["pwd"] ?? "";
 
+// CSRF validation
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+  header('Location: cancellation.php?msg=try_to_access_directly');
+  exit;
+}
+
 // 3. Check if input name matches current user (Anti-wrong delete)
 if ($name !== $loginname) {
   header("Location: cancellation.php?msg=invalid_user");

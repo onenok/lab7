@@ -8,6 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 require_once("connect.php");
 
+// CSRF validation
+if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+  header("Location: signup.php?msg=try_to_access_directly");
+  exit;
+}
+
 // 2. If user already logged-in, don't let them signup again
 if (!empty($_SESSION["login"])) {
   header("Location:index.php?msg=signup_already_logged_in");
