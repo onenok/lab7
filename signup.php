@@ -42,16 +42,27 @@ $display_msg = $messages[$msg_key] ?? '';
 
           <div class="form">
             <div class="inputBox">
-              <input type="text" name="uname" required> <i>Username</i>
+              <input type="text" name="uname" required> <i>*Username</i>
+            </div>
+            <div class="inputBox">
+              <input type="text" name="display_name" required> <i>*Display Name</i>
             </div>
 
             <div class="inputBox">
-              <input type="password" name="pwd" required> <i>Password</i>
+              <input type="tel" name="tel"> <i>Phone Number</i>
+            </div>
+
+            <div class="inputBox">
+              <input type="text" name="addr"> <i>Address</i>
+            </div>
+
+            <div class="inputBox">
+              <input type="password" name="pwd" required> <i>*Password</i>
             </div>
 
             <!-- Confirm Password field -->
             <div class="inputBox">
-              <input type="password" name="confirm_pwd" required> <i>Confirm Password</i>
+              <input type="password" name="confirm_pwd" required> <i>*Confirm Password</i>
             </div>
 
             <div class="inputBox">

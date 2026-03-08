@@ -22,6 +22,9 @@ if (!empty($_SESSION["login"])) {
 
 // 3. Get data from signup form
 $name = $_POST["uname"] ?? "";
+$dName= $_POST["display_name"] ?? $name;
+$tel = $_POST["tel"] ?? "";
+$addr = $_POST["addr"] ?? "";
 $pwd = $_POST["pwd"] ?? "";
 $confirm_pwd = $_POST["confirm_pwd"] ?? "";
 
@@ -49,8 +52,8 @@ if ($res->result && $res->result->num_rows > 0) {
 
 // 6. insert new user
 $hashed = password_hash($pwd, PASSWORD_DEFAULT);
-$sql_insert = "INSERT INTO member(member_id, pwd, member_name) VALUES (?, ?, ?)";
-$res = safeQuery($sql_insert, "sss", [$name, $hashed, $name]);
+$sql_insert = "INSERT INTO member(member_id, pwd, member_name, tel, addr) VALUES (?, ?, ?, ?, ?)";
+$res = safeQuery($sql_insert, "sssss", [$name, $hashed, $dName, $tel, $addr]);
 
 // 7. Check if 1 row was added successfully
 if ($res->affected_rows > 0) {
