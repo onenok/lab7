@@ -47,7 +47,7 @@ if ($res->result && $res->result->num_rows > 0) {
   exit;
 }
 
-// 6. All clear! Let's insert new user (remember to hash password and set display name)
+// 6. insert new user
 $hashed = password_hash($pwd, PASSWORD_DEFAULT);
 $sql_insert = "INSERT INTO member(member_id, pwd, member_name) VALUES (?, ?, ?)";
 $res = safeQuery($sql_insert, "sss", [$name, $hashed, $name]);

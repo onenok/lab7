@@ -95,7 +95,7 @@ $display_msg = $messages[$msg_key] ?? '';
         <p>目前身份：<strong><?php echo htmlspecialchars($username); ?></strong></p>
 
         <div class="public-actions">
-            <a href="list.php" class="action-card"> <!-- lab7 feat: View Product List -->
+            <a href="list.php" class="action-card"> <!-- View Product List -->
                 <div>📋</div>
                 <div>查看商品列表</div>
             </a>

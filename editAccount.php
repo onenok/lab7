@@ -90,7 +90,7 @@ $display_msg = $msgs[$msg_key] ?? '';
 </div>
 
 <script>
-    // Lazy JS: Check match for Name and Pwd
+    // Check match for Name and Pwd
     const nName = document.getElementsByName("new_uname")[0];
     const cName = document.getElementsByName("confirm_new_uname")[0];
     const nPwd = document.getElementsByName("new_pwd")[0];

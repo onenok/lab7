@@ -16,8 +16,8 @@ if (empty($_SESSION['login'])) {
 }
 
 // 3. Get data
-$oldName = $_SESSION['login']; 
-$oldPwd = $_POST["old_pwd"] ?? ""; 
+$oldName = $_SESSION['login'];
+$oldPwd = $_POST["old_pwd"] ?? "";
 
 // CSRF validation
 if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
@@ -25,11 +25,11 @@ if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $
   exit;
 }
 
-$newNameInput = $_POST["new_uname"] ?? ""; 
-$confirmName = $_POST["confirm_new_uname"] ?? ""; // new
+$newNameInput = $_POST["new_uname"] ?? "";
+$confirmName = $_POST["confirm_new_uname"] ?? "";
 
-$newPwdInput = $_POST["new_pwd"] ?? ""; 
-$confirmPwd = $_POST["confirm_new_pwd"] ?? ""; // new
+$newPwdInput = $_POST["new_pwd"] ?? "";
+$confirmPwd = $_POST["confirm_new_pwd"] ?? "";
 
 // --- [STEP 1: AUTH CHECK] ---
 // make sure old password is provided
